@@ -1,4 +1,4 @@
-# -*- coding: ISO-8859-2 -*-
+# -*- coding: utf-8 -*-
 
 import pytest
 import main
@@ -8,36 +8,40 @@ import numpy as np
 
 expected = pickle.load(open('expected','rb'))
 
-results_cylinder_area = expected['cylinder_area']
-results_fib = expected['fib']
-results_matrix_calculations = expected['matrix_calculations']
-results_custom_matrix = expected['custom_matrix']
+result_log_plot = expected['log_plot']
+result_parallel_plot =  expected['parallel_plot']
+result_compare_plot = expected['compare_plot']
 
-@pytest.mark.parametrize("r,h,result", results_cylinder_area)
-def test_cylinder_area(r:float,h:float,result):
-    if math.isnan(result):
-        assert math.isnan(main.cylinder_area(r, h)), 'Spodziewany wynik: {0}, aktualny {1}. Błedy wejścia.'.format(result, main.cylinder_area(r, h))
+result_log_plot_none = expected['log_plot_none']     
+result_parallel_plot_none =  expected['parallel_plot_none']
+result_compare_plot_none = expected['compare_plot_none']
+
+@pytest.mark.mpl_image_compare(baseline_dir='baseline', tolerance=20)
+@pytest.mark.parametrize("x,y,xlabel,ylabel,title,log_axis", result_log_plot)
+def test_log_plot(x,y,xlabel,ylabel,title,log_axis):
+    return main.log_plot(x,y,xlabel,ylabel,title,log_axis)
+
+@pytest.mark.mpl_image_compare(baseline_dir='baseline', tolerance=20)
+@pytest.mark.parametrize("x1,y1,x2,y2,x1label,y1label,x2label,y2label,title,orientation", result_parallel_plot)
+def test_parallel_plot(x1,y1,x2,y2,x1label,y1label,x2label,y2label,title,orientation):
+    return main.parallel_plot(x1,y1,x2,y2,x1label,y1label,x2label,y2label,title,orientation)
+
+@pytest.mark.mpl_image_compare(baseline_dir='baseline', tolerance=20)
+@pytest.mark.parametrize("x1,y1,x2,y2,xlabel,ylabel,title,label1,label2", result_compare_plot)
+def test_compare_plot(x1,y1,x2,y2,xlabel,ylabel,title,label1,label2):
+    return main.compare_plot(x1,y1,x2,y2,xlabel,ylabel,title,label1,label2)
+
+@pytest.mark.parametrize("x,y,xlabel,ylabel,title,log_axis,result", result_log_plot_none)
+def test_log_plot_none(x,y,xlabel,ylabel,title,log_axis,result):
+    assert  main.log_plot(x,y,xlabel,ylabel,title,log_axis) is result
+
+@pytest.mark.parametrize("x1,y1,x2,y2,x1label,y1label,x2label,y2label,title,orientation, result", result_parallel_plot_none)
+def test_parallel_plot_none(x1,y1,x2,y2,x1label,y1label,x2label,y2label,title,orientation,result):
+    assert  main.parallel_plot(x1,y1,x2,y2,x1label,y1label,x2label,y2label,title,orientation) is result
+
+@pytest.mark.parametrize("x1,y1,x2,y2,xlabel,ylabel,title,label1,label2,result", result_compare_plot_none)
+def test_compare_plot_none(x1,y1,x2,y2,xlabel,ylabel,title,label1,label2,result):
+    if main.compare_plot(x1,y1,x2,y2,xlabel,ylabel,title,label1,label2) is not None:
+        assert True
     else:
-        assert main.cylinder_area(r, h) == pytest.approx(result), 'Spodziewany wynik: {0}, aktualny {1}. Błędy implementacji.'.format(result, main.cylinder_area(r, h))
-
-@pytest.mark.parametrize("n,result", results_fib)
-def test_fib(n:int,result):
-    if result is None:
-        assert main.fib(n) is None, 'Spodziewany wynik: {0}, aktualny {1}. Błedy wejścia.'.format(result, main.fib(n))
-    else:
-        assert main.fib(n) == pytest.approx(result), 'Spodziewany wynik: {0}, aktualny {1}. Błędy implementacji.'.format(result, main.fib(n))
-
-@pytest.mark.parametrize("a,result", results_matrix_calculations)
-def test_matrix_calculations(a:float,result):
-    test_result = main.matrix_calculations(a)
-    if not isinstance(result[0], np.ndarray):
-        assert math.isnan(test_result[0]) and test_result[1] == pytest.approx(result[1]) and test_result[2] == pytest.approx(result[2])
-    else:
-        assert test_result[0] == pytest.approx(result[0]) and test_result[1] == pytest.approx(result[1]) and test_result[2] == pytest.approx(result[2])
-
-@pytest.mark.parametrize("m,n,result", results_custom_matrix)
-def test_custom_matrix(m:int, n:int,result):
-        if result is None:
-            assert main.custom_matrix(m, n) is None, 'Spodziewany wynik: {0}, aktualny {1}. Błedy wejścia.'.format(result, main.custom_matrix(m, n))
-        else:
-            assert main.custom_matrix(m, n) == pytest.approx(result), 'Spodziewany wynik: {0}, aktualny {1}. Błędy implementacji.'.format(result, main.custom_matrix(m, n))
+        assert main.compare_plot(x1,y1,x2,y2,xlabel,ylabel,title,label1,label2) is result

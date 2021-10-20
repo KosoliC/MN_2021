@@ -1,5 +1,5 @@
-# lab1
-# Wstęp do Pythona
+# lab1_sol
+
 ## Podstawowe informacje:
 1. Wszystkie niezbędne pliki do wykonania ćwiczenia znajdują się w repozytorium. Nie należy usuwać żadnych plików.
 2. **Nie należy edytować pliku test_main.py**. Zmiana testów spowoduje brak zaliczenia danego laboratorium.
