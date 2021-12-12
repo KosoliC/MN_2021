@@ -14,11 +14,11 @@ def cylinder_area(r: float, h: float):
     float: pole powierzchni walca 
     """
 
-    import math
     if (r > 0) and (h > 0):
         area = 2 * pi * r * r + 2 * pi * r * h
         return area
-    return None
+    else:
+        return np.NaN
 
 
 def fib(n: int):
@@ -32,17 +32,25 @@ def fib(n: int):
     np.ndarray: wektor n pierwszych wyrazów ciągu Fibonnaciego.
     """
 
-    if n < 1:
+    fib_list = np.array([1, 1])
+
+    if n <= 0:
         return None
-    vect = np.ndarray(shape=(1, n))
-    vect[0][0] = 1
-    if n == 1:
-        return vect[0]
+
+    if isinstance(n, int):
+
+        if n == 1:
+            return np.array([1])
+        elif n == 2:
+            return fib_list
+        for i in range(2, n):
+            next_elem = fib_list[-1] + fib_list[-2]
+            fib_list = np.append(fib_list, [next_elem])
+
+        return np.reshape(fib_list, (1, n))
+
     else:
-        vect[0][1] = 1
-    for x in range(2, n):
-        vect[0][x] = (vect[0][x - 2] + vect[0][x - 1])
-    return vect
+        return None
 
 
 def matrix_calculations(a: float):
@@ -58,16 +66,15 @@ def matrix_calculations(a: float):
     (Minv, Mt, Mdet) - opis parametrów w zadaniu 4.
     """
 
-    M = np.array([[a, 1, -a], [0, 1, 1], [-a, a, 1]])
-
-    Mt = np.transpose(M)
-    Mdet = np.linalg.det(M)
-
+    matrix = np.array([[a, 1, -a], [0, 1, 1], [-a, a, 1]])
+    Mdet = np.linalg.det(matrix)
     if Mdet == 0:
-        return (None, Mt, Mdet)
+        Minv = np.NaN
     else:
-        Minv = np.invert(M)
-        return (Minv, Mt, Mdet)
+        Minv = np.linalg.inv(matrix)
+    Mt = np.transpose(matrix)
+
+    return Minv, Mt, Mdet
 
 
 def custom_matrix(m: int, n: int) -> List[List[int]]:
@@ -82,16 +89,20 @@ def custom_matrix(m: int, n: int) -> List[List[int]]:
     np.ndarray: macierz zgodna z opisem z zadania 7.
     """
 
-    if n > 0 and m > 0:
-        result = np.ndarray([m, n])
-        for row, col in result:
-            for elem, _ in col:
-                if row > col:
-                    result[row][col] = row
+    if m < 0 or n < 0:
+        return None
+
+    if isinstance(m, int) and isinstance(n, int):
+        matrix = np.zeros((m, n), dtype=int)
+        for i in range(m):
+            for j in range(n):
+                if i > j:
+                    matrix[i][j] = i
                 else:
-                    result[row][col] = col
-        return result
+                    matrix[i][j] = j
+
+        return matrix
+
     else:
         return None
 
-print("Macierz wynikowa o wymiarach {0}x{1}: \n{2}".format(4, 5, custom_matrix(4,5)))
